@@ -1,3 +1,4 @@
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -13,10 +14,38 @@ class App extends StatelessWidget {
         primaryColor: Colors.blue,
         accentColor: Colors.red,
       ),
-      // home: MoviesScreen(),
-      routes: {
-        "/": (_) => MoviesScreen(),
-        "/movie-details": (_) => MovieDetails(),
+      home: MoviesScreen(),
+      // routes: {
+      //   "/": (_) => MoviesScreen(),
+      //   "/movie-details": (_) => MovieDetails(""),
+      // },
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case "/movie-details":
+            String nameMovie = settings.arguments.toString();
+            return MaterialPageRoute(
+              builder: (context) => MovieDetails(nameMovie),
+            );
+          case "/home":
+            return MaterialPageRoute(
+              builder: (context) => MoviesScreen(),
+            );
+
+          default:
+            return MaterialPageRoute(
+              builder: (context) => Container(
+                child: Text("404"),
+              ),
+            );
+        }
+        // if (settings.name == "/movie-details")
+        //   return MaterialPageRoute(
+        //     builder: (context) => MovieDetails(""),
+        //   );
+        // else if (settings.name == "/home")
+        //   return MaterialPageRoute(
+        //     builder: (context) => MoviesScreen(),
+        //   );
       },
     );
   }
@@ -34,6 +63,21 @@ class MoviesScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            RatingBar.builder(
+              initialRating: 3,
+              minRating: 1,
+              direction: Axis.horizontal,
+              allowHalfRating: true,
+              itemCount: 5,
+              itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+              itemBuilder: (context, _) => Icon(
+                Icons.star,
+                color: Colors.amber,
+              ),
+              onRatingUpdate: (rating) {
+                print(rating);
+              },
+            ),
             GestureDetector(
               onTap: () {
                 // Navigator.push(
@@ -45,7 +89,7 @@ class MoviesScreen extends StatelessWidget {
                 Navigator.pushNamed(
                   context,
                   "/movie-details",
-                  arguments: "Star wars IV",
+                  arguments: "Star wars",
                 );
               },
               child: Container(
@@ -249,17 +293,15 @@ class MoviesScreen extends StatelessWidget {
 }
 
 class MovieDetails extends StatelessWidget {
-  String? movieName;
+  String movieName;
 
-  MovieDetails({this.movieName});
+  MovieDetails(this.movieName);
 
   @override
   Widget build(BuildContext context) {
-    movieName = ModalRoute.of(context)?.settings.arguments as String?;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(movieName ?? ""),
+        title: Text(movieName),
       ),
       body: Container(
         child: InkWell(
